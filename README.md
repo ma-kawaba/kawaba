@@ -1,5 +1,5 @@
 # kawaba
-https://go-kawaba.github.io/kawaba
+https://mawaba.github.io/kawaba
 
 ## Creating Translations
 ### Single word:
