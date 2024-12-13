@@ -1,61 +1,43 @@
 <!DOCTYPE html>
-
 <head>
   <title>kawaba</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="hovertranslate.css" />
-  <script src="main.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="hovertranslate.css">
   <script src="hovertranslate.js"></script>
   <link rel="icon" type="image/x-icon" href="favicon.png">
 </head>
 
 <body>
-  <header>
-    <div class="dropdown">
-      <div class="dropbtn" onclick="dropdownClick(this)">
-        <div class="bar1"></div>
-        <div class="bar2"></div>
-        <div class="bar3"></div>
-      </div>
-      <div id="myDropdown" class="dropdown-content">
-        <a href="index.html">Home</a>
-        <a href="pages/table.html">Roots</a>
-        <a href="pages/Lesson1.html">Lesson 1</a>
-        <a href="pages/Lesson2.html">Lesson 2</a>
-        <a href="pages/Lesson3.html">Lesson 3</a>
-        <a href="pages/Lesson4.html">Lesson 4</a>
-      </div>
+    <header>
+        <div class="container">
+            <img src="kawaba.svg" width="60px" height="60px">
+            <div class="center-text">
+                <h1>kawaba</h1>
+                <h3>the language of parts</h3>
+            </div>
+        </div>
+    </header>
+
+    <div class="nav">
+        <button onclick="location.href='/'">home</button>
+        <button onclick="location.href='pages/lessons.html'">lessons</button>
+        <button onclick="location.href='https://www.reddit.com/r/kawaba/'">reddit</button>
+        <button onclick="location.href='https://discord.gg/nXwr6zwtks'">discord</button>
     </div>
-    <h1>kawaba</h1>
-    <img class="tricon" src="favicon.png" alt="">
-  </header>
 
-  <div id="content">
-    <h2>Home</h2>
+    <h2>speaking in parts — wa uba</h2>
     <p>
-      <span class="tlt">{&#9733 |hello!} {kin|sun} {pe!|good}</span>
+        <span class="tlt">{&#164 |kawaba} {ka|kind, variety} {wa|say, speak} {ba|part, piece}</span> is a <b>minimalist</b> philosophical
+        constructed language that attempts to express the entirety of the human experience through just 120 single syllable roots. with a
+        simple <b>phonology</b>, limited <b>lexicon</b>, and <b>oligosynthetic grammar</b>, the language is designed to be as simple, neutral, and
+        expressive as possible. the language's roots are made up of a reduced list of 50 <b>semantic primes</b>, a set of fundemental
+        linguistic concepts that cannot be defined more simply, in addition to 50 common <b>semantic molecules</b>, more complex yet highly
+        productive concepts that can be defined using semantic primes alone, as well as 20 roots used for grammatical purposes.
     </p>
+    <h2>reading in parts — wi uba</h2>
     <p>
-      Welcome to this short course on the constructed language, kawaba!
+        words and phrases written in <span class="tlt">{&#164 |kawaba} {ka|kind, variety} {wa|say, speak} {ba|part, piece}</span> can be 
+        hovered over to view the translation of each individual root, or the entire word or phrase by hovering over the &#164 symbol.
+        to assist your learning, attempt to translate the word for yourself before using this feature. 
     </p>
-    <p>
-      <span class="tlt">{&#9733 |language of parts} {ka|kind of} {wa|speak} {ba|part}</span> is the language of parts! 
-      It uses only 120 single syllable root words that cannot be defined more simply to convey all ideas through their
-       most fundamental parts. Its roots are
-      based on the concept of semantic primes, the building blocks of meaning in all languages.
-      
-    </p>
-    <p>
-      <span class="tlt">{&#9733 |kawaba is fun!} {ka|kind of} {wa|speak} {ba |part } {pe |good } {na! |emphasis marker}</span></span>
-    </p>
-    <p>
-      Words and sentences in kawaba will be written as above. You can hover over each individual
-      word or element to see the translation, or over the ★ for a full translation. 
-    </p>
-    <p>
-      <span class="tlt">{&#9733 |have fun learning!} {bu|recieve} {'ogi|know} {pe!|good}</span>
-    </p>
-
-    <button id="startbutton" onclick="getStarted()">get started!</button>
-  </div>
 </body>

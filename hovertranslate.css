@@ -1,10 +1,12 @@
 /* original text */
 .og {
+    font-weight: bold;
     border-radius: 5px;
 }
 
 /* translated text */
 .tl {
+    font-weight: normal;
     display: none; /* its hidden by default */
     position:absolute;
     -webkit-transform: translateY(25px);
