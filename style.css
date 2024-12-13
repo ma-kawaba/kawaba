@@ -75,7 +75,7 @@ button {
     font-family: Lexend, sans-serif;
     font-weight: bold;
     padding: 15px;
-    min-width: 20px;
+    min-width: 30px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
@@ -86,7 +86,7 @@ button {
     display: flex;
     align-items: center;
     gap: 5px;
-    margin: 10px auto
+    margin: 10px 0px
 }
 
 .center-text {
