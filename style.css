@@ -4,7 +4,7 @@
 }
 
 html {
-    font-size:16px;
+    font-size:18px;
     font-family:Roboto, sans-serif;
     text-rendering:optimizeLegibility;
     background:#f2f2f2;
@@ -42,6 +42,32 @@ h3 {
     color: #0c3a66
 }
 
+a {
+    text-decoration: none;
+    color: #196bc9;
+}
+
+ol {
+    width: 200px;
+}
+
+button {
+    border: none;
+    background-color: #0c3a66;
+    color:white;
+    font-family: Lexend, sans-serif;
+    font-weight: bold;
+    padding: 15px;
+    width: 120px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition-duration: 0.3s;
+}
+
 .container {
     display: flex;
     align-items: center;
@@ -60,23 +86,6 @@ h3 {
     align-items: center;
     justify-content: center;
     gap: 10px;
-}
-
-button {
-    border: none;
-    background-color: #0c3a66;
-    color:white;
-    font-family: Lexend, sans-serif;
-    font-weight: bold;
-    padding: 15px;
-    width: 120px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition-duration: 0.3s;
 }
 
 
