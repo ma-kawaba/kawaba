@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<head>
+  <title>kawaba</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../hovertranslate.css">
+  <script src="../hovertranslate.js"></script>
+  <link rel="icon" type="image/x-icon" href="../favicon.ico">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <img src="../kawaba.svg" width="60px" height="60px">
+            <div class="center-text">
+                <h1>kawaba</h1>
+                <h3>the language of parts</h3>
+            </div>
+        </div>
+    </header>
+
+    <div class="nav">
+        <button onclick="location.href='/'">home</button>
+        <button onclick="location.href='/lessons'">lessons</button>
+        <button onclick="location.href='https://www.reddit.com/r/kawaba'">reddit</button>
+        <button onclick="location.href='https://discord.gg/nXwr6zwtks'">discord</button>
+    </div>
+    
+    <div class="game-container">
+        <div class="question" id="question"></div>
+        <div class="options" id="options">
+            <!-- Options will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "What does 'example' mean?",
+                options: ["Sample", "Tree", "Ocean", "Run"],
+                correct: 0
+            },
+            {
+                question: "Translate 'sun' to your language:",
+                options: ["Luna", "Soleil", "Sol", "Lume"],
+                correct: 2
+            },
+            {
+                question: "What does 'hello' mean?",
+                options: ["Hi", "Bye", "Thanks", "Good"],
+                correct: 0
+            }
+        ];
+
+        function getRandomQuestion() {
+            return Math.floor(Math.random() * questions.length);
+        }
+
+        function loadQuestion() {
+            const questionEl = document.getElementById('question');
+            const optionsEl = document.getElementById('options');
+
+            const randomIndex = getRandomQuestion();
+            const currentQuestion = questions[randomIndex];
+
+            questionEl.textContent = currentQuestion.question;
+            optionsEl.innerHTML = '';
+
+            currentQuestion.options.forEach((option, index) => {
+                const button = document.createElement('div');
+                button.textContent = option;
+                button.className = 'option';
+                button.onclick = () => checkAnswer(index, randomIndex);
+                optionsEl.appendChild(button);
+            });
+        }
+
+        function checkAnswer(selected, questionIndex) {
+            const options = document.querySelectorAll('.option');
+            options.forEach((option, index) => {
+                if (index === questions[questionIndex].correct) {
+                    option.classList.add('correct');
+                } else if (index === selected) {
+                    option.classList.add('incorrect');
+                }
+            });
+
+            setTimeout(() => {
+                loadQuestion();
+            }, 1000);
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>

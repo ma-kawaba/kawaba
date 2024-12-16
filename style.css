@@ -86,7 +86,7 @@ button {
     display: flex;
     align-items: center;
     gap: 5px;
-    margin: 10px 0px
+    margin: 10px 0px;
 }
 
 .center-text {
@@ -107,4 +107,46 @@ button {
 
 button:hover {
     background-color: #196bc9;
+}
+
+.game-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.question {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.option {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #f9f9f9;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.option:hover {
+    background: #eaeaea;
+}
+
+.correct {
+    background: #c8e6c9;
+}
+
+.incorrect {
+    background: #ffcdd2;
 }
