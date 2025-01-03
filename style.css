@@ -39,6 +39,10 @@ ol {
     width: 200px;
 }
 
+li ul {
+    list-style-type: none;
+}
+
 button {
     border: none;
     background-color: #0c3a66;
