@@ -19,7 +19,7 @@ html {
 body {
     margin:4% auto;
     padding:2%;
-    max-width:800px;
+    max-width:600px;
     border-radius: 10px;
     box-shadow:0 5px 10px rgba(0,0,0,.2),0 15px 40px rgba(0,0,0,.05)
 }
