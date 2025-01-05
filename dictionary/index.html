@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:title" content="kawaba">
+  <meta property="og:description" content="the language of parts!">
+  <meta property="og:image" content="https://kawaba.gay/images/kawaba.svg">
+  <meta property="og:url" content="https://kawaba.gay">
+  <title>kawaba</title>
+  <link rel="icon" href="/favicon.ico">
+  <link href="../style.css" rel="stylesheet">
+  <link href="dictionarystyle.css" rel="stylesheet">
+  <script src="search.js"></script>
+</head>
+<body>
+    <div class="content">
+        <div class="header">
+            <img class="image" src="/images/kawaba.svg" width="60px" height="60px">
+            <div class="title">
+                <h1>kawaba</h1>
+                <h3>the language of parts</h3>
+            </div>
+        </div>
+        <div class="buttons">
+            <a class="button" href="/"><h3>home</h3></a>
+            <a class="button" href="/lessons"><h3>lessons</h3></a>
+            <a class="button" href="/dictionary"><h3>dictionary</h3></a>
+            <a class="button" href="/translations"><h3>translations</h3></a>
+        </div>
+        <div class="title-box">
+            <h3>dictionary</h3>
+        </div>
+        <div class="horizontal vertically-centered" style="justify-content: space-between">
+            <input id="search" type="text" placeholder="Type to search..." />
+            <div>
+                Show compound words:
+                <label class="switch">
+                    <input type="checkbox" id="toggle-compound-words" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+        <div id="no-match">No matches found.</div>
+        <div id="dict">
+            <div class="entry columns">
+                <b>a</b>
+                <i>grammatical</i>
+                <div>subject maker</div>
+            </div>
+            <div class="entry columns">
+                <b>ba</b>
+                <div>
+                    <i>verb</i><br>
+                    <i>head</i><br>
+                    <i>modifier</i>
+                </div>
+                <div>
+                    divide, separate, cut<br>
+                    part, piece, section, component<br>
+                    partial, in part
+                </div>
+            </div>
+            <div class="entry columns">
+                <b>e</b>
+                <i>grammatical</i>
+                <div>location marker</div>
+            </div>
+            <div class="entry columns">
+                <b>i</b>
+                <i>grammatical</i>
+                <div>time maker</div>
+            </div>
+            <div class="entry columns">
+                <b>o</b>
+                <i>grammatical</i>
+                <div>object maker</div>
+            </div>
+            <div class="entry columns">
+                <b>u</b>
+                <i>grammatical</i>
+                <div>instrument maker</div>
+            </div>
+        <div id="dict" class="compound-words">
+            <div class="entry columns">
+                <b>kawa</b>
+                <i>noun</i>
+                <div>language, dialect, speech variety</div>
+            </div>
+        </div>
+        </div>
+    </div>
+</body>
+</html>
