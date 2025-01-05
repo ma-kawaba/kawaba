@@ -1,18 +1,20 @@
 #no-match {
-    color: red;
     display: none;
+    background-color: #ff000080;
+    padding: 10px;
+    border-radius: 10px;
 }
 
 #search {
     margin: 10px 0;
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #333;
     border-radius: 10px;
+    width: 50%
 }
 
 .entry {
     margin-bottom: 10px;
-    padding: 10px;
     border: 1px solid #ccc;
     border-radius: 10px;
 }
@@ -24,6 +26,7 @@
 .columns {
     display: grid;
 	grid-template-columns: 1fr 1fr 3fr;
+    padding: 10px
 }
 
 .switch {
