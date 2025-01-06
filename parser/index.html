@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+        <title>telo misikeke | a toki pona grammar checker</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <meta property="og:title" content="telo misikeke" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://telo-misikeke.gitlab.io/" />
+        <meta property="og:image" content="https://telo-misikeke.gitlab.io/preview.png" />
+        <meta property="og:description" content="a toki pona grammar checker" />
+        <meta name="theme-color" content="#FFFFF">
+
+        <meta name="twitter:site" content="telo misikeke pi toki pona">
+        <meta name="twitter:title" content="telo misikeke pi toki pona">
+        <meta name="twitter:description" content="a toki pona grammar checker">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:image:src" content="https://telo-misikeke.gitlab.io/preview.png">
+
+        <link rel="stylesheet" type="text/css" href="../style.css">
+        <link rel="stylesheet" type="text/css" href="parserstyle.css">
+        <link rel="stylesheet" type="text/css" href="TextareaDecorator.css">
+        <link rel="icon" type="image/x-icon" href="favicon.png">
+
+        <script src="popper.min.js" type="text/javascript"></script>
+        <script src="tippy.min.js" type="text/javascript"></script>
+
+        <script src="Parser.js" type="text/javascript"></script>
+        <script src="TextareaDecorator.js" type="text/javascript"></script>
+        <script src="rules.js" type="text/javascript"></script>
+
+        <script type="text/javascript">
+            // get element shortcut
+            function $one(e) { return document.querySelector(e); }
+            function $all(e) { return document.querySelectorAll(e); }
+        
+            var rules;
+        
+            function run() {
+                let allRules = Object.keys(rules).filter(function (x) {
+                    return rules[x].category;
+                });
+    
+                var parser = new ParserWithCallbacks(rules);
+                // Generate CSS
+                function ruleClassSelector(ruleName) {
+                    return '.ldt .' + ruleName;
+                }
+    
+                let errorStyles = '';
+                for (let category in rulesByCategory) {
+                    // Tippy boxes
+                    errorStyles += '.tippy-box[data-theme="' + category + '"]' +
+                        '{' +
+                        'border-color: var(--' + category + ');' +
+                        'background-color: var(--' + category + '-desat);' +
+                        '}';
+                    // Highlighted error in the text
+                    errorStyles += rulesByCategory[category].map(ruleClassSelector).join(', ') +
+                        '{' +
+                        'border-bottom: 2px solid var(--' + category + ');' +
+                        'background-color: var(--' + category + '-desat);' +
+                        '}';
+                }
+    
+                let styleElement = document.createElement('style');
+                styleElement.innerHTML = errorStyles;
+    
+                document.body.appendChild(styleElement);
+    
+                textarea = $one('#txt');
+                decorator = new TextareaDecorator(textarea, parser);
+    
+                let last_tippy = null;
+    
+                textarea.onclick = function (e) {
+                    let err = document.elementsFromPoint(e.clientX, e.clientY).filter(function (x) {
+                        return x.tagName == 'SPAN' && getCategory(x.classList[0]);
+                    });
+    
+                    // Look a bit on the left/right
+                    if (!err.length) {
+                        err = document.elementsFromPoint(e.clientX + 5, e.clientY).filter(function (x) {
+                            return x.tagName == 'SPAN' && getCategory(x.classList[0]);
+                        });
+                    }
+                    if (!err.length) {
+                        err = document.elementsFromPoint(e.clientX - 5, e.clientY).filter(function (x) {
+                            return x.tagName == 'SPAN' && getCategory(x.classList[0]);
+                        });
+                    }
+    
+                    if (err.length) {
+                        showTooltip(err[0]);
+                    } else {
+                        hideTooltip();
+                    }
+                }
+    
+                function hideTooltip() {
+                    if (last_tippy) {
+                        last_tippy.destroy();
+                        last_tippy = null;
+                    }
+                }
+    
+                function showTooltip(element) {
+                    let text = element.textContent;
+                    let errorCode = element.classList[0];
+                    let category = getCategory(errorCode);
+    
+                    // Get match
+                    let index = Array.prototype.indexOf.call(element.parentNode.children, element);
+                    let match = parser.tokens[index].match;
+                    let categoryName = category.replace(/-/g, ' ');
+                    categoryName = categoryName[0].toUpperCase() + categoryName.slice(1);
+    
+                    let content = '<div class="error-category">' +
+                        categoryName +
+                        '</div>' +
+                        getMessage(errorCode, match).replace(/\n/g, '<br>');
+    
+                    if (!category) return;
+    
+                    let instance = tippy(element, {
+                        appendTo: document.body,
+                        allowHTML: true,
+                        content: content,
+                        theme: getCategory(errorCode),
+                        arrow: true,
+                        interactive: true,
+                    });
+                    instance.show();
+    
+                    last_tippy = instance;
+                }
+    
+                $one('#poki-pi-toki-sina').style.display = 'block';
+    
+                // Fixes a glitch on mobile
+                setTimeout((x) => {
+                    decorator.update();
+                }, 100);
+            }
+    
+            run();
+        </script>        
+    </head>
+    <body>
+        <div class="content">
+            <div class="header">
+                <a href="/"><img class="image" src="/images/kawaba.svg" width="60px" height="60px"></a>
+                <div class="title">
+                    <h1>kawaba</h1>
+                    <h3>the language of parts</h3>
+                </div>
+            </div>
+            <div class="buttons">
+                <a class="button" href="/lessons"><h3>lessons</h3></a>
+                <a class="button" href="/translations"><h3>translations</h3></a>
+                <a class="button" href="/dictionary"><h3>dictionary</h3></a>
+                <a class="button" href="/parser"><h3>parser</h3></a>
+            </div>
+            <div class="title-box">
+                <h3>parser and grammar checker</h3>
+            </div>
+            <div id="poki-pi-toki-sina" style="display: none">
+                <textarea id="txt" class="input" spellcheck="false">jan o, toki! :-)
+
+mi jan Nikola, li kama
+pana e lukin pi ilo ni tawa sini.
+
+mi pona, taso, toki mi li ken pi ike.
+pona la, mi li jo e ilo ni a!
+mi pali e ilo mi kepeken jan pona mi. jan pona
+mi li jan Kijom, li pona kin e ilo mi.
+
+Mi pana e ilo ni tawa sina kepeken linluwi :) kulijo a!
+mi pali e ilo tan mi wile pona e toki. mi pana tawa jan ale e ilo mi.
+mi pali mute e ilo mi: ilo mi li ala e ilo ike.
+
+mi jo e ilo ni la, jan li lon e tomo mi la, mi ken toki pona tawa ona.
+ni la, ilo ni li pali e ni: mi sama e jan sona a!
+mi tan e ma Kepeke. jan li tawa e tomo mi la, mi pilin pona.
+
+o kepeken ilo mi! ni li ilo pi nanpa wan :-)
+jan pi nasin nasa pi toki ike li sona ala e ilo mi.
+mi wile e ni: ilo mi pona e toki pi jan ale.
+ni li pi pona mute a! pi pona mute.
+
+ilo ni li lukin sama ilo https://languagetool.org/.
+ni li ilo pi nimi pona. ona li lukin pona.
+nasin pi ilo pi nimi pona li ni: pakala li insa toki sina la, o alasa e ona!
+
+o jan, lipu sina li pakala en ike la, ilo mi li ken pona e ona.
+ni la, ona kama pona!
+
+mi en sina ken lukin e ilo mi. mi wile pona e lipu mi en lipu sina ;)
+sina wile kepeken ilo mi? pona a!
+
+sina wile toki tawa mi lon Siko lon ma pona la, sina sina ken mute mute. ilo Siko la, mi Nikola.
+jan ale li li ken toki tawa mi. jan li o toki tawa mi a! toki e mi li pona tawa mi.
+sina wile toki ala wile toki tawa mi? jan li wile mute toki tawa mi la jan li ken.
+
+tenpo ale la, sina anu jan pona sina pi toki pona anu jan ante li wile kepeken
+e ilo pona mi pi nasin pona la, o kepeken ona lon tenpo pi wile sina a!
+</textarea>
+            </div>
+        </div>
+    </body>
+</html>

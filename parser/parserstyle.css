@@ -1,0 +1,55 @@
+#poki-pi-toki-sina {
+    flex-grow: 1;
+    overflow: hidden;
+    height: 80%;
+    padding: 10px;
+    border: 1px solid darkgray;
+    border-radius: 15px;
+}
+
+[data-tippy-root] {
+    max-width: min(350px, 90%) !important;
+}
+
+.tippy-box {
+    color: black;
+    font-size: 16px;
+    border: 3px solid black;
+    border-left-width: 10px;
+}
+
+.error-category {
+    color: gray !important;
+}
+
+:root {
+  --nitpick-h: 50;
+  --possible-error-h: 280;
+  --error-h: 0;
+  --uncommon-h: 200;
+
+  --nitpick: hsl(var(--nitpick-h), 100%, 70%);
+  --possible-error: hsl(var(--possible-error-h), 100%, 70%);
+  --error: hsl(var(--error-h), 100%, 70%);
+  --uncommon: hsl(var(--uncommon-h), 100%, 70%);
+
+  --nitpick-desat: hsl(var(--nitpick-h), 100%, 97%);
+  --possible-error-desat: hsl(var(--possible-error-h), 100%, 97%);
+  --error-desat: hsl(var(--error-h), 100%, 97%);
+  --uncommon-desat: hsl(var(--uncommon-h), 100%, 97%);
+
+  --nitpick-desaturated: hsl(
+      var(--foreground-h),
+      calc(var(--foreground-s) / 2%),
+      calc(var(--foreground-l) * 1%)
+  );
+}
+
+.more-infos {
+    display: inline-block;
+    margin-top: 10px;
+}
+
+#options {
+    display: none
+}
