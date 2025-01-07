@@ -32,120 +32,286 @@
 
         <script type="text/javascript">
             // get element shortcut
-            function $one(e) { return document.querySelector(e); }
-            function $all(e) { return document.querySelectorAll(e); }
-        
+            function $one(e){ return document.querySelector(e); };
+            function $all(e){ return document.querySelectorAll(e); };
+
             var rules;
-        
-            function run() {
-                let allRules = Object.keys(rules).filter(function (x) {
-                    return rules[x].category;
-                });
-    
-                var parser = new ParserWithCallbacks(rules);
-                // Generate CSS
-                function ruleClassSelector(ruleName) {
-                    return '.ldt .' + ruleName;
-                }
-    
-                let errorStyles = '';
-                for (let category in rulesByCategory) {
-                    // Tippy boxes
-                    errorStyles += '.tippy-box[data-theme="' + category + '"]' +
-                        '{' +
-                        'border-color: var(--' + category + ');' +
-                        'background-color: var(--' + category + '-desat);' +
-                        '}';
-                    // Highlighted error in the text
-                    errorStyles += rulesByCategory[category].map(ruleClassSelector).join(', ') +
-                        '{' +
-                        'border-bottom: 2px solid var(--' + category + ');' +
-                        'background-color: var(--' + category + '-desat);' +
-                        '}';
-                }
-    
-                let styleElement = document.createElement('style');
-                styleElement.innerHTML = errorStyles;
-    
-                document.body.appendChild(styleElement);
-    
-                textarea = $one('#txt');
-                decorator = new TextareaDecorator(textarea, parser);
-    
-                let last_tippy = null;
-    
-                textarea.onclick = function (e) {
-                    let err = document.elementsFromPoint(e.clientX, e.clientY).filter(function (x) {
-                        return x.tagName == 'SPAN' && getCategory(x.classList[0]);
+
+            // wait for the page to finish loading before accessing the DOM
+            window.onload = function() {
+
+                function run() {
+
+                    let useLinebreaks = $one('#useLinebreaks').checked;
+
+                    let allRules = Object.keys(rules).filter(function(x) {
+                        return rules[x].category;
                     });
-    
-                    // Look a bit on the left/right
-                    if (!err.length) {
-                        err = document.elementsFromPoint(e.clientX + 5, e.clientY).filter(function (x) {
+
+                    var parser = new ParserWithCallbacks(rules, useLinebreaks);
+                    // Generate CSS
+                    function ruleClassSelector(ruleName) { return '.ldt .' + ruleName }
+
+                    let errorStyles = '';
+                    for(let category in rulesByCategory) {
+
+                        // Tippy boxes
+                        errorStyles += '.tippy-box[data-theme="' + category + '"]' +
+                                       '{' +
+                                       'border-color: var(--' + category + ');' +
+                                       'background-color: var(--' + category + '-desat);' +
+                                       '}';
+                        // Highlighted error in the text
+                        errorStyles += rulesByCategory[category].map(ruleClassSelector).join(', ') +
+                                       '{' +
+                                       'border-bottom: 2px solid var(--' + category + ');' +
+                                       'background-color: var(--' + category + '-desat);' +
+                                       '}';
+                    }
+
+                    let styleElement = document.createElement('style');
+                    styleElement.innerHTML = errorStyles;
+
+                    document.body.appendChild(styleElement);
+
+                    textarea = $one('#txt');
+                    decorator = new TextareaDecorator( textarea, parser );
+
+
+                    document.body.addEventListener('keyup', function(event) {
+                        if(event.ctrlKey && event.key == ".") {
+                            let currentPos = textarea.selectionStart;
+
+                            let charsSeen = 0;
+                            let tokensSeen = 0;
+
+                            // Find the current token
+                            for(let i=0; i<parser.tokens.length && charsSeen<currentPos+1; i++) {
+                                let token = parser.tokens[i];
+                                charsSeen += token.text.length;
+                                tokensSeen++;
+                            }
+
+                            let nextErrorPos = textarea.value.length;
+
+                            let foundToken = null;
+
+                            // Find the next interesting error
+                            for(let i=tokensSeen; i<parser.tokens.length; i++) {
+                                let token = parser.tokens[i];
+
+                                if(allRules.indexOf(token.ruleName) !== -1) {
+                                    // Found
+                                    nextErrorPos = charsSeen;
+                                    foundToken = true;
+                                    break;
+                                }
+
+                                tokensSeen++;
+                                charsSeen += token.text.length;
+                            }
+
+
+                            // Place the cursor a few lines after the next error
+                            let newlinesAfterToken = 0;
+                            for(let i=tokensSeen; i<parser.tokens.length; i++) {
+                                let token = parser.tokens[i];
+
+                                charsSeen += token.text.length;
+
+                                newlinesAfterToken += token.text.indexOf('\n') != -1;
+
+                                if(newlinesAfterToken > 3) {
+                                    break;
+                                }
+                            }
+
+                            let aFewLinesBelow = charsSeen;
+
+                            textarea.selectionStart = textarea.selectionEnd = aFewLinesBelow;
+
+                            // Scroll to the cursor position
+                            // https://stackoverflow.com/a/40951875
+                            textarea.blur();
+                            textarea.focus();
+
+                            // Place back the cursor at the next error
+                            //
+                            // The setTimeout is there to allow the
+                            // browser to set the cursor a few lines
+                            // below first, so that the final scroll
+                            // position is not at the end of the page
+                            setTimeout(() => {
+                                textarea.selectionStart = textarea.selectionEnd = nextErrorPos;
+
+                                textarea.blur();
+                                textarea.focus();
+                            }, 0);
+
+                            hideTooltip();
+
+                            if(foundToken) {
+                                let el = document.querySelector('.ldt > pre > :nth-child(' + (tokensSeen+1) + ')');
+                                showTooltip(el);
+                                el.style.opacity = '0.25';
+                                el.style.transition = 'opacity 0.3s ease';
+                                setTimeout(function() {
+                                    el.style.opacity = '1';
+                                }, 300);
+                            }
+                        }
+                    }, false);
+
+                    let last_tippy = null;
+
+                    textarea.onclick = function(e) {
+                        let err = document.elementsFromPoint(e.clientX, e.clientY).filter(function(x) {
                             return x.tagName == 'SPAN' && getCategory(x.classList[0]);
                         });
+
+                        // Look a bit on the left/right
+                        if(!err.length) {
+                            err = document.elementsFromPoint(e.clientX + 5, e.clientY).filter(function(x) {
+                                return x.tagName == 'SPAN' && getCategory(x.classList[0]);
+                            });
+                        }
+                        if(!err.length) {
+                            err = document.elementsFromPoint(e.clientX - 5, e.clientY).filter(function(x) {
+                                return x.tagName == 'SPAN' && getCategory(x.classList[0]);
+                            });
+                        }
+
+                        if(err.length) {
+                            showTooltip(err[0]);
+                        } else {
+                            hideTooltip();
+                        }
                     }
-                    if (!err.length) {
-                        err = document.elementsFromPoint(e.clientX - 5, e.clientY).filter(function (x) {
-                            return x.tagName == 'SPAN' && getCategory(x.classList[0]);
+
+                    function hideTooltip() {
+                        if(last_tippy) {
+                            last_tippy.destroy();
+                            last_tippy = null;
+                        }
+                    }
+
+                    function showTooltip(element) {
+                        let text = element.textContent;
+                        let errorCode = element.classList[0];
+                        let category = getCategory(errorCode);
+
+                        // Get match
+                        let index = Array.prototype.indexOf.call(element.parentNode.children, element);
+                        let match = parser.tokens[index].match;
+                        let categoryName = category.replace(/-/g, ' ');
+                        categoryName = categoryName[0].toUpperCase() + categoryName.slice(1);
+
+                        let content = '<div class="error-category">' +
+                                      categoryName +
+                                      '</div>' +
+                                      getMessage(errorCode, match).replace(/\n/g, '<br>');
+
+                        if(!category) return;
+
+                        let instance = tippy(element, {
+                            appendTo: document.body,
+                            allowHTML: true,
+                            content: content,
+                            theme: getCategory(errorCode),
+                            arrow: true,
+                            interactive: true,
                         });
+                        instance.show();
+
+                        last_tippy = instance;
                     }
-    
-                    if (err.length) {
-                        showTooltip(err[0]);
-                    } else {
-                        hideTooltip();
-                    }
+
+                    $one('#poki-pi-toki-sina').style.display = 'block';
+                    $one('#loading').style.display = 'none';
+
+                    // Fixes a glitch on mobile
+                    setTimeout((x) => {
+                        decorator.update();
+                    }, 100);
                 }
-    
-                function hideTooltip() {
-                    if (last_tippy) {
-                        last_tippy.destroy();
-                        last_tippy = null;
-                    }
+
+                function fetch_and_run(urls) {
+                    let url = urls[0];
+                    // Fetch
+                    fetch(url)
+                        .then((x) => {
+                            if(x.ok)
+                                return x.json();
+                            else
+                                throw {name: 'NetworkError'};
+                        })
+                        .then((data) => {
+                            reloadOptions();
+                            rules = build_rules(parseLipuLinku(data));
+
+                            ['ignore-nitpick', 'ignore-possible-error', 'ignore-uncommon'].forEach(function(name) {
+                                let category = name.replace(/^ignore-/, '');
+                                let ignore = $one('#' + name).checked;
+
+                                if(!ignore) return;
+
+                                Object.keys(rules).forEach(function(key) {
+                                    if(rules[key].category == category) {
+                                        delete rules[key];
+                                    }
+                                });
+                            });
+                        })
+                        .then(run)
+                        .catch((err) => {
+                            if(urls.length > 1) {
+                                // Fallback URLs
+                                console.log(url, 'failed to load');
+                                console.log(err);
+                                fetch_and_run(urls.slice(1));
+                            } else if(err.name == 'NetworkError') {
+                                // Last fallback URL didn't work
+                                alert('No wordlist available, sorry!');
+                            } else {
+                                alert("pakala a! Looks like we broke something, try again later...\n" + JSON.stringify("" + err));
+                                console.log(err);
+                            }
+                        });
                 }
-    
-                function showTooltip(element) {
-                    let text = element.textContent;
-                    let errorCode = element.classList[0];
-                    let category = getCategory(errorCode);
-    
-                    // Get match
-                    let index = Array.prototype.indexOf.call(element.parentNode.children, element);
-                    let match = parser.tokens[index].match;
-                    let categoryName = category.replace(/-/g, ' ');
-                    categoryName = categoryName[0].toUpperCase() + categoryName.slice(1);
-    
-                    let content = '<div class="error-category">' +
-                        categoryName +
-                        '</div>' +
-                        getMessage(errorCode, match).replace(/\n/g, '<br>');
-    
-                    if (!category) return;
-    
-                    let instance = tippy(element, {
-                        appendTo: document.body,
-                        allowHTML: true,
-                        content: content,
-                        theme: getCategory(errorCode),
-                        arrow: true,
-                        interactive: true,
-                    });
-                    instance.show();
-    
-                    last_tippy = instance;
-                }
-    
-                $one('#poki-pi-toki-sina').style.display = 'block';
-    
-                // Fixes a glitch on mobile
-                setTimeout((x) => {
-                    decorator.update();
-                }, 100);
+                fetch_and_run(["https://api.linku.la/v1/words", "linku.json"]);
+            };
+
+            function reloadWithOptions() {
+                saveOptions();
+                window.location.reload();
             }
-    
-            run();
-        </script>        
+
+            let optionInputsIds = ['useLinebreaks', 'ignore-nitpick', 'ignore-possible-error', 'ignore-uncommon', 'txt'];
+            function saveOptions() {
+                optionInputsIds.forEach((id) => {
+                    let el = $one('#' + id);
+                    let value = el.type == 'checkbox' ? el.checked : el.value;
+
+                    localStorage.setItem('option.' + id,  JSON.stringify(value));
+                });
+            }
+            function reloadOptions() {
+                optionInputsIds.forEach((id) => {
+                    let el = $one('#' + id);
+                    let value = JSON.parse(localStorage.getItem('option.' + id));
+
+                    if(value === null) return;
+
+                    if(el.type == 'checkbox') {
+                        el.checked = value;
+                    } else {
+                        el.value = value;
+                    }
+
+                    localStorage.removeItem('option.' + id);
+                });
+            }
+        </script> 
     </head>
     <body>
         <div class="content">
@@ -165,6 +331,17 @@
             <div class="title-box">
                 <h3>parser and grammar checker</h3>
             </div>
+            <p id="options">
+                <label><input id="useLinebreaks" type="checkbox" onclick="reloadWithOptions()"> Line breaks form new sentences</label><br>
+                <label><input id="ignore-nitpick" type="checkbox" onclick="reloadWithOptions()"> Don't show
+                    <span style="background-color: var(--nitpick-desat); border-bottom: 2px solid var(--nitpick);">Nitpicks</span>
+                </label><br>
+                <label><input id="ignore-possible-error" type="checkbox" onclick="reloadWithOptions()"> Don't show
+                    <span style="background-color: var(--possible-error-desat); border-bottom: 2px solid var(--possible-error);">Possible errors</span>
+                </label><br>
+                <label><input id="ignore-uncommon" type="checkbox" onclick="reloadWithOptions()"> Don't show <span style="background-color: var(--uncommon-desat); border-bottom: 2px solid var(--uncommon);">non-pu/ku words</span>
+                </label>
+            </p>
             <div id="poki-pi-toki-sina" style="display: none">
                 <textarea id="txt" class="input" spellcheck="false">jan o, toki! :-)
 
