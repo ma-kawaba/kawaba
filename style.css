@@ -21,7 +21,7 @@ h1, h2, h3 {
     text-align: center;
 }
 
-li, p {
+ul, li, p {
     font-size:18px;
 }
 
@@ -71,7 +71,8 @@ li, p {
     display: flex;
 	align-items: flex-start;
     justify-content: center;
-    gap: 10px
+    gap: 10px;
+    margin: 10px 0;
 }
 
 .button {
@@ -79,6 +80,20 @@ li, p {
     background-color: #0c3a66;
     color:white;
     width: 142.5px;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition-duration: 0.3s;
+}
+
+.audio-button {
+    font-weight: bold;
+    border: none;
+    background-color: #0c3a66;
+    color:white;
+    width: 40px;
     text-decoration: none;
     display: inline-block;
     font-size: 16px;

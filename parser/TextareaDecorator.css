@@ -39,7 +39,6 @@
 	top: 0;
 	left: 0;
 	width: 100%;
-	height: 100%;
 	display: inline;
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -60,4 +59,3 @@
 	/* IE doesn't support rgba textarea, so use vendor specific alpha filter */
 	filter: alpha(opacity = 20);
 }
-
