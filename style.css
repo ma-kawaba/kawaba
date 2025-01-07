@@ -106,6 +106,10 @@ ul, li, p {
     background-color: #196bc9;
 }
 
+.audio-button:hover {
+    background-color: #196bc9;
+}
+
 .title-box {
     text-align: center;
     width: 100%;
