@@ -85,7 +85,6 @@ li, p {
     cursor: pointer;
     border-radius: 5px;
     transition-duration: 0.3s;
-    margin: 5px 0;
 }
 
 .button:hover {

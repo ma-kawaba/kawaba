@@ -5,6 +5,7 @@
     padding: 10px;
     border: 1px solid darkgray;
     border-radius: 15px;
+    margin: 10px 0;
 }
 
 [data-tippy-root] {
