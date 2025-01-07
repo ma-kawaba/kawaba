@@ -599,13 +599,6 @@ function build_rules() {
             'https://lipu-sona.pona.la/7a.html'
         ),
 
-        nimiSuliPuAla: new Err(
-            /\b([A-Z][a-zA-Z]*)\b/,
-            'Proper noun with unauthorized syllables.',
-            'nitpick',
-            'https://www.reddit.com/r/tokipona/comments/e09ebn/sona_kalama_pi_toki_pona_table_of_usedpermitted/'
-        ),
-
         // This rule matches loan words when the 'nitpick' category is disabled
         properNounsOk: new Err(
             /\b([A-Z][a-zA-Z]*)\b/,

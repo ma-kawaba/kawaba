@@ -4,7 +4,7 @@
  * Modified by Nicolas Hurtubise, 2023
  */
 
-function ParserWithCallbacks(rules, useLinebreaks) {
+function ParserWithCallbacks(rules) {
     var api = this;
 
     function rule_matches(rule, input, behind) {
@@ -38,9 +38,6 @@ function ParserWithCallbacks(rules, useLinebreaks) {
         var tokens = [];
 
         var chunkSeparator = /\n\n/g;
-
-        if(useLinebreaks)
-            chunkSeparator = /\n/g;
 
         var chunks = allInputs.split(chunkSeparator);
 
@@ -79,13 +76,6 @@ function ParserWithCallbacks(rules, useLinebreaks) {
                     console.log(input);
                     throw 'Bad set of regexes';
                 }
-            }
-
-            if(idx != chunks.length - 1) {
-                tokens.push({
-                    text: useLinebreaks ? '\n' : '\n\n',
-                    ruleName: 'lineBreak',
-                });
             }
         });
 

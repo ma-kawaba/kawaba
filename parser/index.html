@@ -14,7 +14,6 @@
     <link rel="stylesheet" type="text/css" href="../style.css">
     <link rel="stylesheet" type="text/css" href="parserstyle.css">
     <link rel="stylesheet" type="text/css" href="TextareaDecorator.css">
-    <link rel="icon" type="image/x-icon" href="favicon.png">
 
     <script src="popper.min.js" type="text/javascript"></script>
     <script src="tippy.min.js" type="text/javascript"></script>
@@ -34,14 +33,11 @@
         window.onload = function() {
 
             function run() {
-
-                let useLinebreaks = $one('#useLinebreaks').checked;
-
                 let allRules = Object.keys(rules).filter(function(x) {
                     return rules[x].category;
                 });
 
-                var parser = new ParserWithCallbacks(rules, useLinebreaks);
+                var parser = new ParserWithCallbacks(rules);
                 // Generate CSS
                 function ruleClassSelector(ruleName) { return '.ldt .' + ruleName }
 
@@ -142,58 +138,9 @@
                 }, 100);
             }
 
-            function fetch_and_run() {
-                rules = build_rules();
-
-                ['ignore-nitpick', 'ignore-possible-error', 'ignore-uncommon'].forEach(function(name) {
-                    let category = name.replace(/^ignore-/, '');
-                    let ignore = $one('#' + name).checked;
-
-                    if(!ignore) return;
-
-                    Object.keys(rules).forEach(function(key) {
-                        if(rules[key].category == category) {
-                            delete rules[key];
-                        }
-                    });
-                });
-
-                run();
-            }
-
-            fetch_and_run();
+            rules = build_rules();
+            run();
         };
-
-        function reloadWithOptions() {
-            saveOptions();
-            window.location.reload();
-        }
-
-        let optionInputsIds = ['useLinebreaks', 'ignore-nitpick', 'ignore-possible-error', 'ignore-uncommon', 'txt'];
-        function saveOptions() {
-            optionInputsIds.forEach((id) => {
-                let el = $one('#' + id);
-                let value = el.type == 'checkbox' ? el.checked : el.value;
-
-                localStorage.setItem('option.' + id,  JSON.stringify(value));
-            });
-        }
-        function reloadOptions() {
-            optionInputsIds.forEach((id) => {
-                let el = $one('#' + id);
-                let value = JSON.parse(localStorage.getItem('option.' + id));
-
-                if(value === null) return;
-
-                if(el.type == 'checkbox') {
-                    el.checked = value;
-                } else {
-                    el.value = value;
-                }
-
-                localStorage.removeItem('option.' + id);
-            });
-        }
     </script> 
 </head>
 <body>
@@ -214,22 +161,12 @@
         <div class="title-box">
             <h3>parser and grammar checker</h3>
         </div>
-        <p id="options">
-            <label><input id="useLinebreaks" type="checkbox" onclick="reloadWithOptions()"> Line breaks form new sentences</label><br>
-            <label><input id="ignore-nitpick" type="checkbox" onclick="reloadWithOptions()"> Don't show
-                <span style="background-color: var(--nitpick-desat); border-bottom: 2px solid var(--nitpick);">Nitpicks</span>
-            </label><br>
-            <label><input id="ignore-possible-error" type="checkbox" onclick="reloadWithOptions()"> Don't show
-                <span style="background-color: var(--possible-error-desat); border-bottom: 2px solid var(--possible-error);">Possible errors</span>
-            </label><br>
-            <label><input id="ignore-uncommon" type="checkbox" onclick="reloadWithOptions()"> Don't show <span style="background-color: var(--uncommon-desat); border-bottom: 2px solid var(--uncommon);">non-pu/ku words</span>
-            </label>
-        </p>
         <div id="poki-pi-toki-sina" style="display: none">
             <textarea id="txt" class="input" spellcheck="false">
 toki! tenpo ni la ilo ni li tawa toki pona,
-taso tenpo kama la ona li tawa toki Kawapa a!</textarea>
+taso tenpo kama la ona li tawa toki Kawaba a!</textarea>
         </div>
+        <p>this parser and grammar checker is a modified version of <a href="https://telo-misikeke.gitlab.io">telo misikeke</a></p>
     </div>
 </body>
 </html>
