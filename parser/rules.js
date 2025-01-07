@@ -12,7 +12,7 @@ function build_rules() {
     // Full sentence: includes all the `X la, Y la, ... Z`
     // Partial sentence: includes only one la/main-block
     let FULL_SENTENCE_SEPARATOR    = /(([\x02;.·…!?“”])\s*)/.source;
-    let PARTIAL_SENTENCE_SEPARATOR = /(([\x02;.·…!?“”:]\s*(taso,?|a+(\s+a+)*\b,?)?)\s*|[,\s]*\bla\b[,\s]*|\btaso,|,\s*taso\b|\bo,\s|\s*\x02)/.source;
+    let PARTIAL_SENTENCE_SEPARATOR = /([\x02;.·…!?“”:]|\bnan\b|\bnen\b|\bnin\b|\bnon\b|\bnun\b)/.source;
     let PARTICLES = 'en|li|e|la|pi|o|anu';
     let PREPOSITIONS = 'lon|tawa|tan|sama|kepeken';
     let PREVERBS = 'wile|sona|awen|kama|ken|lukin|open|pini|alasa';
@@ -78,12 +78,21 @@ function build_rules() {
 
         argumentInitial: new Err(
             [
-                new RegExp(PARTIAL_SENTENCE_SEPARATOR + '?' + '\\b[aeiou]'),
-                function(m, b) {
-                    return startOfFullSentence(m, b);
-                },
+                new RegExp(
+                    PARTIAL_SENTENCE_SEPARATOR + '\\s*\\b[aeiou]\\w*'
+                ),
             ],
             'A sentence must begin with a verb',
+            'error'
+        ),
+
+        verbNonInitial: new Err(
+            [
+                new RegExp(
+                    PARTIAL_SENTENCE_SEPARATOR + '\\s*\\b\\w+\\b\\s+\\b(?![aeioun])\\w*\\b'
+                ),
+            ],
+            'The word after the first word following a partial sentence separator must begin with a vowel',
             'error'
         ),
 
