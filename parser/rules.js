@@ -2,50 +2,11 @@ var getCategory;
 var getMessage;
 var rulesByCategory;
 
-function parseLipuLinku(data) {
-    return Object.keys(data).map(function(word) {
-        return [word, data[word].usage_category];
-    });
-}
-
-function build_rules(wordList) {
+function build_rules() {
 
     function in_array(value, array) {
         return array.indexOf(value) !== -1;
     }
-
-    let commonWords = wordList
-        .filter((pair) => {
-            return in_array(pair[1], ['common', 'core', 'widespread']);
-        })
-        .map((pair) => {
-            return  ['a', 'n'].indexOf(pair[0]) != -1 // == 'n'
-                 ? (pair[0] + '+') // Match aaaa... nnnnn...
-                 : pair[0]
-        });
-    let uncommonWords = wordList
-        .filter((pair) => {
-            return !in_array(pair[1], ['common', 'core', 'widespread']);
-        })
-        .map((pair) => pair[0]);
-
-    /* Force some words to be in the "common words" category
-     *
-     *
-     * - 'ali' (nimi pu): This seems to have fallen out of usage, but
-     *   it feels wrong to exclude pu words
-     * - As of 2024-02, 'su' is too recent to be in use, but it's an
-     *   official book by jan Sonja and was part of the reserved
-     *   words in ku
-     */
-    ['ali', 'su'].forEach((w) => {
-        commonWords = commonWords.concat(w);
-        uncommonWords = uncommonWords.filter((x) => x != w);
-    });
-
-    let allWords = commonWords.concat(uncommonWords);
-
-    let matchesKnownWord = new RegExp('^\\b(' + allWords.join('|') + ')\\b$');
 
     // \x02 is the ASCII char:       002   2     02    STX (start of text)
     // Full sentence: includes all the `X la, Y la, ... Z`
@@ -115,17 +76,6 @@ function build_rules(wordList) {
             '', false
         ),
 
-        nimiPuAla: new Err(
-            [
-                new RegExp(PARTIAL_SENTENCE_SEPARATOR + '?' + /(\b([a-z][a-zA-Z]*)\b)/.source),
-                function(m, behind) {
-                    return !m[m.length-1].match(matchesKnownWord);
-                },
-            ],
-            'Unknown word.',
-            'error',
-            'https://linku.la/'
-        ),
         noLiAfterMiSina: new Err(
             [
                 /(mi|sina)\s+li\b/,
@@ -196,23 +146,6 @@ function build_rules(wordList) {
             'nitpick',
             'https://github.com/kilipan/nasin-toki#x-ala-x'
         ),
-        dontCapitalizeSentences: new Err(
-            [
-                new RegExp(PARTIAL_SENTENCE_SEPARATOR + '?' +
-                           '\\b(' +
-                           allWords.map((x) => {
-                               // Special case for nnnnnnnn...
-                               return x == 'n+'
-                                    ? 'Nn*'
-                                    : x[0].toUpperCase() + x.slice(1)
-                           }).join('|') + ')\\b'),
-                function(m, b) {
-                    return startOfFullSentence(m, b);
-                },
-            ],
-            'Sentences should not start with a capital letter.',
-            'error'
-        ),
         puttingEAfterWordDoesntGerundizeIt: new Err(
             [
                 new RegExp(
@@ -241,10 +174,6 @@ function build_rules(wordList) {
                 ),
                 function(m, behind) {
                     let lastWord = m[m.length-1];
-
-                    // Prioritize showing erroneous words over a possible error
-                    if(!lastWord.match(matchesKnownWord))
-                        return false;
 
                     return !in_array(lastWord, [
                         'wan', 'tu', 'mute', 'ale',
@@ -530,10 +459,6 @@ function build_rules(wordList) {
                     if(possibleLookahead)
                         possibleLookahead = possibleLookahead.replace(/^,/, '').trim().replace(/\s+/, ' ');
 
-                    // Prioritize showing erroneous words over a nitpick
-                    if(!lastModifier.match(matchesKnownWord))
-                        return false;
-
                     let allowedThirdWord = PARTICLES.split('|')
                                                     .concat(['mute', 'lili']) // when insisting "mute mute"
                                                     .concat(['ala', 'kin', 'a']);
@@ -611,10 +536,6 @@ function build_rules(wordList) {
                     // that case
                     if(startOfFullSentence("foo", behind + m[2])) {
                         let matchedNoun = m[m.length - 4].toLowerCase();
-
-                        if(matchedNoun.match(matchesKnownWord)) {
-                            return false;
-                        }
                     }
 
                     return !cleanSentence.match(/\bla\b/);
@@ -668,30 +589,6 @@ function build_rules(wordList) {
             /\b(poki\s+loje\s+lon\s+sinpin\s+li\s+poki\s+tawa|suwi\s+telo\s+wawa\s+kepeken\s+namako\s+en\s+kule\s+ijo\s+kasi)\b/,
             "Please unsub from Half As Interesting.",
             'error'
-        ),
-
-        // Not an error, must match this before trying to match a nimiPuAla
-        commonWords: new Err(
-            [
-                new RegExp('\\b((' + commonWords.join('|') + ')|' + /((Jan|Jen|Jon|Jun|Kan|Ken|Kin|Kon|Kun|Lan|Len|Lin|Lon|Lun|Man|Men|Min|Mon|Mun|Nan|Nen|Nin|Non|Nun|Pan|Pen|Pin|Pon|Pun|San|Sen|Sin|Son|Sun|Tan|Ten|Ton|Tun|Wan|Wen|Win|An|En|In|On|Un|Ja|Je|Jo|Ju|Ka|Ke|Ki|Ko|Ku|La|Le|Li|Lo|Lu|Ma|Me|Mi|Mo|Mu|Na|Ne|Ni|No|Nu|Pa|Pe|Pi|Po|Pu|Sa|Se|Si|So|Su|Ta|Te|To|Tu|Wa|We|Wi|A|E|I|O|U)(jan|jen|jon|jun|kan|ken|kin|kon|kun|lan|len|lin|lon|lun|man|men|min|mon|mun|nan|nen|nin|non|nun|pan|pen|pin|pon|pun|san|sen|sin|son|sun|tan|ten|ton|tun|wan|wen|win|ja|je|jo|ju|ka|ke|ki|ko|ku|la|le|li|lo|lu|ma|me|mi|mo|mu|na|ne|ni|no|nu|pa|pe|pi|po|pu|sa|se|si|so|su|ta|te|to|tu|wa|we|wi)*)/.source + ')\\b'),
-                function(m, behind) {
-                    // Avoid catching nimiSuliNasa (ma Mija*nm*a => ma Mijama)
-                    return m[4] == undefined || !m[4].match(/n[nm]/);
-                }
-            ],
-            '', false),
-
-        uncommonWord: new Err(
-            new RegExp('\\b(' + uncommonWords.join('|') + ')\\b'),
-            'Uncommon word, make sure your target audience knows it.',
-            'uncommon',
-            'https://linku.la/'
-        ),
-
-        // This rule matches words when the 'uncommon' category is disabled
-        uncommonWordOk: new Err(
-            new RegExp('\\b(' + uncommonWords.join('|') + ')\\b'),
-            '', false
         ),
 
         nimiSuliNasa: new Err(
@@ -773,6 +670,5 @@ function build_rules(wordList) {
 if(typeof(module) != 'undefined') {
     module.exports = {
         build_rules: build_rules,
-        parseLipuLinku: parseLipuLinku,
     };
 }
