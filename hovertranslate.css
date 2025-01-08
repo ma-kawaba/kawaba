@@ -1,7 +1,7 @@
 /* original text */
 .og {
     font-weight: bold;
-    border-radius: 5px;
+    font-size: 18px;
 }
 
 /* translated text */
@@ -9,8 +9,7 @@
     font-weight: normal;
     display: none; /* its hidden by default */
     position:absolute;
-    -webkit-transform: translateY(25px);
-    transform: translateY(25px);
+    transform: translateY(32px);
     z-index: 1;
     color: black;
     background: #f7e5a4;
@@ -22,9 +21,12 @@
 /* format the background of the original text */
 /* this class is the comtainer for the og and tl classes */
 .tlt {
-    color: black;
-    background: #f7e5a4;
-    height: 14pt;
-    border-radius: 5px;;
-    padding: 4px;
+    height: 22px;
+    padding: 10px;
+    text-align: center; 
+    background-color: #0c3a66;
+    color: #ffffff;
+    overflow: hidden;
+    border-radius: 10px;
+    text-align: center;
 }
