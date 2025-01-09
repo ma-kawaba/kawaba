@@ -11,10 +11,11 @@ function build_rules() {
     // \x02 is the ASCII char:       002   2     02    STX (start of text)
     // Full sentence: includes all the `X la, Y la, ... Z`
     // Partial sentence: includes only one la/main-block
+    let WORD_SEPARATOR             = /([\x02;.·…!?“”\s])/.source;
     let FULL_SENTENCE_SEPARATOR    = /(([\x02;.·…!?“”])\s*)/.source;
     let PARTIAL_SENTENCE_SEPARATOR = /([\x02;.·…!?“”:]|\bnan\b|\bnen\b|\bnin\b|\bnon\b|\bnun\b)/.source;
-    let PARTICLES = 'en|li|e|la|pi|o|anu';
-    let PREPOSITIONS = 'lon|tawa|tan|sama|kepeken';
+    let PREFIXES = 'a|e|i|o|u|an|en|in|on|un';
+    let CONJUNCTIONS = 'nan|nen|nin|non|nun';
     let PREVERBS = 'wile|sona|awen|kama|ken|lukin|open|pini|alasa';
     let PROPER_NOUNS = "((Jan|Jen|Jon|Jun|Kan|Ken|Kin|Kon|Kun|Lan|Len|Lin|Lon|Lun|Man|Men|Min|Mon|Mun|Nan|Nen|Nin|Non|Nun|Pan|Pen|Pin|Pon|Pun|San|Sen|Sin|Son|Sun|Tan|Ten|Ton|Tun|Wan|Wen|Win|An|En|In|On|Un|Ja|Je|Jo|Ju|Ka|Ke|Ki|Ko|Ku|La|Le|Li|Lo|Lu|Ma|Me|Mi|Mo|Mu|Na|Ne|Ni|No|Nu|Pa|Pe|Pi|Po|Pu|Sa|Se|Si|So|Su|Ta|Te|To|Tu|Wa|We|Wi|A|E|I|O|U)(jan|jen|jon|jun|kan|ken|kin|kon|kun|lan|len|lin|lon|lun|man|men|min|mon|mun|nan|nen|nin|non|nun|pan|pen|pin|pon|pun|san|sen|sin|son|sun|tan|ten|ton|tun|wan|wen|win|ja|je|jo|ju|ka|ke|ki|ko|ku|la|le|li|lo|lu|ma|me|mi|mo|mu|na|ne|ni|no|nu|pa|pe|pi|po|pu|sa|se|si|so|su|ta|te|to|tu|wa|we|wi)*)";
 
@@ -80,10 +81,10 @@ function build_rules() {
         argumentInitial: new Err(
             [
                 new RegExp(
-                    PARTIAL_SENTENCE_SEPARATOR + '(\\s*)(\\b[aeiou]\\w*\\b)'
+                    PARTIAL_SENTENCE_SEPARATOR + '\\s*((' + PREFIXES + ')\\w*)' + WORD_SEPARATOR
                 ),
             ],
-            'A phrase must begin with a verb',
+            'A sentence must begin with a verb',
             'error',
             null,
             (key, match) => {
@@ -95,12 +96,12 @@ function build_rules() {
                     },
                     {
                         text: match[3].replace(/\x02/g, ''),
-                        ruleName: 'punctuation',
+                        ruleName: key,
                         match: match,
                     },
                     {
-                        text: match[4].replace(/\x02/g, ''),
-                        ruleName: key,
+                        text: match[5].replace(/\x02/g, ''),
+                        ruleName: 'punctuation',
                         match: match,
                     },
                 ];
@@ -110,10 +111,10 @@ function build_rules() {
         verbNonInitial: new Err(
             [
                 new RegExp(
-                    PARTIAL_SENTENCE_SEPARATOR + '((\\s*\\b\\w+\\b\\s+)+)' + '(\\b(?![aeioun])\\w*\\b)'
+                    PARTIAL_SENTENCE_SEPARATOR + '((\\s*\\w+\\s+)+)((?!' + PREFIXES + ')\\w*)'
                 ),
             ],
-            'A verb must appear at the beginning of a phrase',
+            'A sentence may not contain multiple verbs',
             'error',
             null,
             (key, match) => {
