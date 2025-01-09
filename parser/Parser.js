@@ -57,11 +57,17 @@ function ParserWithCallbacks(rules) {
                         var start = match.index;
                         var end = start + match[0].length;
 
-                        tokens.push({
-                            text: match[0].replace(/\x02/g, ''),
-                            ruleName: key,
-                            match: match,
-                        });
+                        if (typeof (rules[key].tokenize) === "function") {
+                            for (let token of rules[key].tokenize(key, match)) {
+                                tokens.push(token);
+                            }
+                        } else {
+                            tokens.push({
+                                text: match[0].replace(/\x02/g, ''),
+                                ruleName: key,
+                                match: match,
+                            });
+                        }
 
                         behind += input.slice(0, end);
                         behind = behind.slice(-20); // keep max 20 chars of lookbehind

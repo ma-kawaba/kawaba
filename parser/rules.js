@@ -45,7 +45,7 @@ function build_rules() {
         return m[0].match(/^(mi|sina)\s/) && !startOfPartialSentence(m, behind)
     }
 
-    function Err(rule, message, category, more_infos) {
+    function Err(rule, message, category, more_infos, custom_tokenizer) {
         this.raw_rule = rule;
 
         if(typeof(rule[0]) === "undefined") {
@@ -65,6 +65,7 @@ function build_rules() {
         this.message = message;
         this.category = category;
         this.more_infos = more_infos;
+        this.tokenize = custom_tokenizer;
     }
 
     var rules = {
@@ -79,21 +80,61 @@ function build_rules() {
         argumentInitial: new Err(
             [
                 new RegExp(
-                    PARTIAL_SENTENCE_SEPARATOR + '\\s*\\b[aeiou]\\w*'
+                    PARTIAL_SENTENCE_SEPARATOR + '(\\s*)(\\b[aeiou]\\w*\\b)'
                 ),
             ],
-            'A sentence must begin with a verb',
-            'error'
+            'A phrase must begin with a verb',
+            'error',
+            null,
+            (key, match) => {
+                return [
+                    {
+                        text: match[2].replace(/\x02/g, ''),
+                        ruleName: 'partialSentenceSeparator',
+                        match: match,
+                    },
+                    {
+                        text: match[3].replace(/\x02/g, ''),
+                        ruleName: 'punctuation',
+                        match: match,
+                    },
+                    {
+                        text: match[4].replace(/\x02/g, ''),
+                        ruleName: key,
+                        match: match,
+                    },
+                ];
+            }
         ),
 
         verbNonInitial: new Err(
             [
                 new RegExp(
-                    PARTIAL_SENTENCE_SEPARATOR + '\\s*\\b\\w+\\b\\s+\\b(?![aeioun])\\w*\\b'
+                    PARTIAL_SENTENCE_SEPARATOR + '((\\s*\\b\\w+\\b\\s+)+)' + '(\\b(?![aeioun])\\w*\\b)'
                 ),
             ],
-            'The word after the first word following a partial sentence separator must begin with a vowel',
-            'error'
+            'A verb must appear at the beginning of a phrase',
+            'error',
+            null,
+            (key, match) => {
+                return [
+                    {
+                        text: match[2].replace(/\x02/g, ''),
+                        ruleName: 'partialSentenceSeparator',
+                        match: match,
+                    },
+                    {
+                        text: match[3].replace(/\x02/g, ''),
+                        ruleName: 'ignore',
+                        match: match,
+                    },
+                    {
+                        text: match[5].replace(/\x02/g, ''),
+                        ruleName: key,
+                        match: match,
+                    },
+                ];
+            }
         ),
 
         startOfText: new Err(
