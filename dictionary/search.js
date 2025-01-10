@@ -24,14 +24,19 @@ function buildIndex(element, parentElement = null) {
     });
 }
 
+// ...existing code...
+
 // Initialize the search functionality
 function initializeSearch() {
     const entries = Array.from(document.querySelectorAll('#dict > .entry'));
     const searchInput = document.getElementById('search');
     const noMatchMessage = document.getElementById('no-match');
     const columns = document.querySelector('.columns');
-    const compoundWordsSection = document.querySelector('.compound-words');
+    const compoundWords = document.querySelector('.compound-words');
     const toggleCompoundWords = document.getElementById('toggle-compound-words'); // Toggle switch
+
+    // Reset the toggle switch to the off position
+    toggleCompoundWords.checked = false;
 
     // Build the index for dictionary entries
     entries.forEach(entry => buildIndex(entry));
@@ -43,7 +48,7 @@ function initializeSearch() {
         if (!query) { // Show all entries if no query
             noMatchMessage.style.display = 'none';
             if (columns) columns.style.display = 'grid';
-            if (compoundWordsSection && toggleCompoundWords.checked) compoundWordsSection.style.display = 'block';
+            if (compoundWords && toggleCompoundWords.checked) compoundWords.style.display = 'grid';
             entries.forEach(entry => entry.style.display = 'grid');
             return;
         }
@@ -54,7 +59,7 @@ function initializeSearch() {
         if (matchingWords.length === 0) { // No matches found
             noMatchMessage.style.display = 'block';
             if (columns) columns.style.display = 'none';
-            if (compoundWordsSection && toggleCompoundWords.checked) compoundWordsSection.style.display = 'none';
+            if (compoundWords && toggleCompoundWords.checked) compoundWords.style.display = 'none';
             entries.forEach(entry => entry.style.display = 'none');
             return;
         }
@@ -62,7 +67,7 @@ function initializeSearch() {
         // Show matching entries
         noMatchMessage.style.display = 'none';
         if (columns) columns.style.display = 'grid';
-        if (compoundWordsSection && toggleCompoundWords.checked) compoundWordsSection.style.display = 'grid';
+        if (compoundWords && toggleCompoundWords.checked) compoundWords.style.display = 'grid';
         entries.forEach(entry => entry.style.display = 'none');
         matchingWords.forEach(word => {
             wordIndex[word].forEach(entry => entry.style.display = 'grid');
@@ -71,11 +76,11 @@ function initializeSearch() {
 
     // Toggle compound-words visibility based on the switch state
     toggleCompoundWords.addEventListener('change', () => {
-        if (compoundWordsSection) {
+        if (compoundWords) {
             if (toggleCompoundWords.checked) {
-                compoundWordsSection.style.display = 'grid';
+                compoundWords.style.display = 'grid';
             } else {
-                compoundWordsSection.style.display = 'none';
+                compoundWords.style.display = 'none';
             }
         }
     });
