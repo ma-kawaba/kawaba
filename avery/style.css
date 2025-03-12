@@ -170,6 +170,12 @@ ul, ol {
 	margin: 5px;
 }
 
+.submission {
+	height: 110px;
+	width: 180px;
+	margin: 5px;
+}
+
 .menu-bar {
 	background-color: #4c6444;
 	margin: 2px;
@@ -217,7 +223,6 @@ ul, ol {
 	display: flex;
 	align-items: flex-start;
 	flex-wrap: wrap;
-	gap: 10px
 }
 
 .text {
