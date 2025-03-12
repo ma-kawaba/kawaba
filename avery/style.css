@@ -258,6 +258,11 @@ ul, ol {
 	cursor: url("images/cursorhover.png"), auto;
 }
 
+.scroll {
+	overflow-y: auto;
+	height: 300px;
+}
+
 .controls {
 	display: flex;
 	justify-content: center;
