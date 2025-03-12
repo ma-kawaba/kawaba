@@ -187,6 +187,7 @@ ul, ol {
 	display: flex;
 	align-items: center;
 	padding: 0;
+	height: 28px;
 }
 
 .menu-bar-item {
@@ -194,7 +195,7 @@ ul, ol {
 	color: #000000;
 	text-decoration: none;
 	border: 1px solid transparent;
-	padding: 0px 10px;
+	padding: 0 10px;
 	margin: 0;
 }
 
@@ -272,7 +273,7 @@ ul, ol {
 	height: 24px;
 	width: 100px;
 	cursor: url("images/cursorhover.png"), auto;
-	padding: 0 5px;
+	margin: 0 10px;
 }
 
 #brushColor {
@@ -280,6 +281,7 @@ ul, ol {
 	width: 24px;
 	cursor: url("images/cursorhover.png"), auto;
 	padding: 2px;
+	margin: 0 10px
 }
 
 #message {
