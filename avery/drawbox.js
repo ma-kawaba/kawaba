@@ -51,10 +51,8 @@ function saveState() {
 
 // Undo the last drawing action
 function undo() {
-  if (canvasHistory.length > 0) {
-    const lastState = canvasHistory.pop();
-    ctx.putImageData(lastState, 0, 0);
-  }
+  const lastState = canvasHistory.pop();
+  ctx.putImageData(lastState, 0, 0);
 }
 
 // Adjust brush size and color dynamically
@@ -122,16 +120,12 @@ canvas.addEventListener('touchmove', (event) => {
   if (drawing) draw(event.touches[0]);
 });
 
-// Check if the canvas is empty (all white pixels)
-function isCanvasEmpty() {
-  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  const pixels = imageData.data;
-  for (let i = 0; i < pixels.length; i += 4) {
-    if (pixels[i] !== 255 || pixels[i + 1] !== 255 || pixels[i + 2] !== 255) {
-      return false; // Found a non-white pixel
-    }
-  }
-  return true;
+// Check if the canvas is empty
+function isCanvasDrawn() {
+  const empty = document.createElement('canvas');
+  empty.width = canvas.width;
+  empty.height = canvas.height;
+  return canvas.toDataURL() !== empty.toDataURL();
 }
 
 // Resize the canvas on window resize
@@ -146,21 +140,126 @@ fillCanvasWithWhite();
 // Undo button event listener
 undoButton.addEventListener('click', undo);
 
-// Submit button event listener
+// Submit button event listener (unchanged)
+submitButton.addEventListener('click', async () => {
+  const imageData = canvas.toDataURL();
+  const message = messageInput.value.trim();
+});
+
+// Submit the drawing and message to Discord Webhook
 submitButton.addEventListener('click', async () => {
   const imageData = canvas.toDataURL(); // Get canvas data as base64 image
   const message = messageInput.value.trim();
 
-  if (isCanvasEmpty() && !message) {
+  if (!isCanvasDrawn() && !message) {
     alert('You must draw something or enter a message before submitting!');
     return;
   }
 
-  if (!isCanvasEmpty() && message) {
+  if (isCanvasDrawn() && message) {
     await sendMessageAndDrawingToDiscord(message, imageData);
+    return;
   } else if (message) {
-    await sendMessageToDiscord(message);
-  } else if (!isCanvasEmpty()) {
-    await sendDrawingToDiscord(imageData);
+      await sendMessageToDiscord(message);
+  } else if (isCanvasDrawn()) {
+      await sendDrawingToDiscord(imageData);
   }
+  return;
 });
+
+// Function to send message to Discord
+async function sendMessageAndDrawingToDiscord(message, imageData) {
+  const webhookUrl = 'https://discord.com/api/webhooks/1349113245155197028/mGhUqujM0OOE02MbTrYc3A2PV62tPtRPTVPdqhcKKY8t3Y08mKIgRckKBuHrRBXD4ENg'; // Replace with your actual Discord webhook URL
+
+  // Convert the base64 data URL to a Blob
+  const blob = await fetch(imageData).then((res) => res.blob());
+
+  // Create a FormData object for the file and message
+  const formData = new FormData();
+  formData.append('payload_json', JSON.stringify({ content: message })); // Attach the message
+  formData.append('file', blob, 'drawing.png'); // Attach the image
+
+  try {
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (response.status === 429) {
+      throw new Error(`Too many requests! please wait before submitting your next message`) 
+    } else if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    alert('Your message and drawing have been submitted!');
+    messageInput.value = ''; // Clear the message input
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+    canvasHistory = []; // Clear history after submission
+  } catch (error) {
+    console.error('Error sending message to Discord:', error);
+    alert(error);
+  }
+}
+
+// Function to send message to Discord
+async function sendMessageToDiscord(message) {
+  const webhookUrl = 'https://tuvik-dog.xyz/web-inbox.php?target=aster'; // Replace with your actual Discord webhook URL
+
+  // Create a FormData object for the file and message
+  const formData = new FormData();
+  formData.append('payload_json', JSON.stringify({ content: message })); // Attach the message
+
+  try {
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (response.status === 429) {
+      throw new Error(`Too many requests! please wait before submitting your next message`) 
+    } else if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    alert('Your message has been submitted!');
+    messageInput.value = ''; // Clear the message input
+  } catch (error) {
+    console.error('Error sending message to Discord:', error);
+    alert(error);
+  }
+}
+
+// Function to send drawing to Discord
+async function sendDrawingToDiscord(imageData) {
+  const webhookUrl = 'https://tuvik-dog.xyz/web-inbox.php?target=aster'; // Replace with your actual Discord webhook URL
+
+  // Convert the base64 data URL to a Blob
+  const blob = await fetch(imageData).then((res) => res.blob());
+
+  // Create a FormData object for the file and message
+  const formData = new FormData();
+  formData.append('file', blob, 'drawing.png'); // Attach the image
+
+  try {
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (response.status === 429) {
+      throw new Error(`Too many requests! please wait before submitting your next message`) 
+    } else if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    alert('Your drawing has been submitted!');
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+    canvasHistory = []; // Clear history after submission
+  } catch (error) {
+    console.error('Error sending drawing and message to Discord:', error);
+    alert(error);
+  }
+}
+
+// Undo button event listener
+undoButton.addEventListener('click', undo);
