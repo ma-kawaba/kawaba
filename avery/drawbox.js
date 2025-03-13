@@ -120,19 +120,12 @@ canvas.addEventListener('touchmove', (event) => {
   if (drawing) draw(event.touches[0]);
 });
 
-// Check if the canvas is empty (all white)
+// Check if the canvas is empty
 function isCanvasDrawn() {
-  const pixelData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-  
-  // Loop through pixels in steps of 4 (RGBA)
-  for (let i = 0; i < pixelData.length; i += 4) {
-    // Check if the pixel is not white (not 255, 255, 255) or not fully transparent
-    if (pixelData[i] !== 255 || pixelData[i + 1] !== 255 || pixelData[i + 2] !== 255) {
-      return true; // Something has been drawn
-    }
-  }
-
-  return false; // Canvas is entirely white
+  const empty = document.createElement('canvas');
+  empty.width = canvas.width;
+  empty.height = canvas.height;
+  return canvas.toDataURL() !== empty.toDataURL();
 }
 
 // Resize the canvas on window resize
